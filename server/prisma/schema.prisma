@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model adminlog {
+  id            Int             @id @default(autoincrement())
+  username      String          @unique(map: "username") @db.VarChar(255)
+  password      String          @db.VarChar(255)
+  empName       String?         @db.VarChar(255)
+  createdByEmp  String?         @db.VarChar(255)
+  activeStatus  String          @default("active")
+  email         String          @unique(map: "email") @db.VarChar(255)
+  resetPassword resetPassword[]
+}
+
+model resetPassword {
+  resetPasswordId Int      @id @default(autoincrement())
+  token           String
+  time            String
+  adminId         Int
+  adminlog        adminlog @relation(fields: [adminId], references: [id], map: "resetPAssword_adminlog_fKey")
+}
+
+model books {
+  bookId          Int          @id @default(autoincrement())
+  author          String       @db.VarChar(255)
+  title           String       @db.VarChar(255)
+  place_publisher String       @db.VarChar(255)
+  edition         String       @db.VarChar(255)
+  year            Int
+  pages           Int
+  source          String       @db.VarChar(255)
+  billNo          Int
+  BillDate        DateTime
+  cost            Float
+  issuedTo        String       @default("") @db.VarChar(255)
+  updatedByEmp    String       @db.VarChar(255)
+  issuebooks      issuebooks[]
+}
+
+model issuebooks {
+  issuedBookId   Int      @id @default(autoincrement())
+  bookId         Int
+  userId         Int
+  dateOfIssue    DateTime
+  dateOfReturn   DateTime
+  fine           Float    @default(0)
+  issuedByEmp    String
+  collectedByEmp String   @default("")
+  status         String   @default("issued")
+  books          books    @relation(fields: [bookId], references: [bookId], map: "issueBooks_bookId_fkey")
+  user           user     @relation(fields: [userId], references: [userId], map: "issueBooks_userId_fkey")
+
+  @@index([bookId], map: "issueBooks_bookId_fkey")
+  @@index([userId], map: "issueBooks_userId_fkey")
+}
+
+model user {
+  userId       Int          @id @default(autoincrement())
+  name         String
+  email        String
+  phone_no     String
+  designation  String
+  department   String
+  createdByEmp String
+  uniqueUserId String       @unique(map: "uniqueUserId") @default(uuid())
+  activeStatus String       @default("active") @db.VarChar(255)
+  issuebooks   issuebooks[]
+}
