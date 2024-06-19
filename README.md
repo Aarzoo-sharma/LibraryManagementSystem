@@ -6,6 +6,7 @@ npx prisma init
 
 open .env file and you now need to adjust the connection URL to point to your own database
 DATABASE_URL="mysql://USER:PASSWORD@HOST:PORT/DATABASE"
+DATABASE_URL="mysql://johndoe:randompassword@localhost:3306/mydb"
 
 migrate data model
 npx prisma migrate dev --name init
